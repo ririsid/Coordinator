@@ -101,6 +101,13 @@ extension ViewTransition {
     public static func present<V: View>(_ view: V) -> ViewTransition {
         .init(payload: ViewTransition.Payload.present, view: view)
     }
+
+    @inlinable
+    public static func present<V: View>(_ view: V, modalPresentationStyle: ModalPresentationStyle) -> ViewTransition {
+        .init(payload: { presentationView in
+            ViewTransition.Payload.present(presentationView.modalPresentationStyle(modalPresentationStyle))
+        }, view: view)
+    }
     
     @inlinable
     public static func replace<V: View>(with view: V) -> ViewTransition {
