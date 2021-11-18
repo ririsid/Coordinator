@@ -12,6 +12,7 @@ extension ViewTransition {
         case present(AnyPresentationView)
         case replace(with: AnyPresentationView)
         case dismiss
+        case dismissAll
         case dismissView(named: AnyHashable)
         
         case push(AnyPresentationView)
@@ -43,6 +44,8 @@ extension ViewTransition.Payload {
                 case .replace(let view):
                     return view
                 case .dismiss:
+                    return nil
+                case .dismissAll:
                     return nil
                 case .dismissView:
                     return nil
@@ -82,6 +85,8 @@ extension ViewTransition.Payload {
                 case .replace:
                     self = .replace(with: newValue)
                 case .dismiss:
+                    break
+                case .dismissAll:
                     break
                 case .dismissView:
                     break
