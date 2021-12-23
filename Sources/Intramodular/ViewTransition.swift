@@ -108,6 +108,8 @@ extension ViewTransition: CustomStringConvertible {
                 return "Replace"
             case .dismiss:
                 return "Dismiss"
+            case .dismissAll:
+                return "Dismiss all"
             case .dismissView(let name):
                 return "Dismiss \(name)"
             case .push:
