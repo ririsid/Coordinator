@@ -6,7 +6,9 @@ import Merge
 import SwiftUIX
 
 protocol _opaque_AnyViewCoordinator {
+    #if os(iOS) || os(macOS) || os(tvOS)
     func _setViewController(_ viewController: AppKitOrUIKitViewController)
+    #endif
 }
 
 public final class AnyViewCoordinator<Route: Hashable>: _opaque_AnyViewCoordinator, ViewCoordinator {
@@ -45,9 +47,10 @@ public final class AnyViewCoordinator<Route: Hashable>: _opaque_AnyViewCoordinat
     public func trigger(_ route: Route) -> AnyPublisher<ViewTransitionContext, Error> {
         triggerImpl(route)
     }
-    
+
+    #if os(iOS) || os(macOS) || os(tvOS)
     func _setViewController(_ viewController: AppKitOrUIKitViewController) {
-        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS)
         if let base = base as? _opaque_UIViewControllerCoordinator {
             if base.rootViewController == nil {
                 base.rootViewController = viewController
@@ -59,28 +62,9 @@ public final class AnyViewCoordinator<Route: Hashable>: _opaque_AnyViewCoordinat
         } else if let base = base as? _opaque_AnyViewCoordinator {
             base._setViewController(viewController)
         }
+        #else
+        fatalError("unimplemented")
         #endif
     }
-}
-
-public class EmptyViewCoordinator: ViewCoordinator {
-    public typealias Route = Never
-    
-    public var environmentBuilder = EnvironmentBuilder()
-    
-    public init() {
-        
-    }
-    
-    public func transition(for: Never) -> ViewTransition {
-        
-    }
-    
-    public func triggerPublisher(for _: Route) -> AnyPublisher<ViewTransitionContext, Error> {
-        
-    }
-    
-    public func trigger(_ : Route) -> AnyPublisher<ViewTransitionContext, Error> {
-        
-    }
+    #endif
 }
