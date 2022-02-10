@@ -4,9 +4,11 @@ This framework uses three main concepts:
 
 - **Route** - an identifiable value that represents a destination in your app 
 - **Transition** - a visual transition to be applied on a view 
-- **Coordinator** - an object that maps **routes** to **transitions** and applies it on the current view hierarchy 
+- **Coordinator** - an object that maps **routes** to **transitions** and applies it on the current view hierarchy.
 
 # Getting Started 
+
+## Basics
 
 ### Definite a set of destinations
 
@@ -85,3 +87,42 @@ struct ContentView: View {
 }
 ```
 
+## Custom Transitions
+
+If you need lower level access to the underlying `UIViewController ` or `UIWindow`, use `ViewTransition.custom` to implement a custom transition.
+
+In the following example, `MyRoute.foo` is implemented via a standard `ViewTransition` whereas `MyRoute.bar` is implemented as a custom one.
+
+```swift
+import Coordinator
+import UIKit
+
+enum MyRoute {
+    case foo
+    case bar
+}
+
+class MyViewCoordinator: UIViewControllerCoordinator<MyRoute> {
+    override func transition(for route: MyRoute) -> ViewTransition {
+        switch route {
+            case .foo:
+                return .present(Text("Foo"))
+            case .bar:
+                return .custom {
+                    guard let rootViewController = self.rootViewController else {
+                        return assertionFailure()
+                    }
+
+                    // Use `rootViewController` to perform a custom transition.
+                    rootViewController.present(
+                        UIViewController(),
+                        animated: true,
+                        completion: { }
+                    )
+                }
+        }
+    }
+}
+```
+
+**Note:** Refrain from adding side-effects or business logic to your custom transition block. A `ViewCoordinator` is only supposed to handle transitions. Adding anything beyond transition logic breaks the conceptual model of a coordinator.

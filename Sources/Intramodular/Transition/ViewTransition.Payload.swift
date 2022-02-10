@@ -27,7 +27,7 @@ extension ViewTransition {
         
         case linear([ViewTransition])
         
-        case dynamic(() -> AnyPublisher<ViewTransitionContext, Swift.Error>)
+        case custom(() -> AnyPublisher<ViewTransitionContext, Swift.Error>)
         
         case none
     }
@@ -66,7 +66,7 @@ extension ViewTransition.Payload {
                     return view
                 case .linear:
                     return nil
-                case .dynamic:
+                case .custom:
                     return nil
                 case .none:
                     return nil
@@ -105,7 +105,7 @@ extension ViewTransition.Payload {
                     self = .setRoot(newValue)
                 case .linear:
                     break
-                case .dynamic:
+                case .custom:
                     break
                 case .none:
                     break
