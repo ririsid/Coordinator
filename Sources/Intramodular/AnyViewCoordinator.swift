@@ -11,14 +11,14 @@ protocol _opaque_AnyViewCoordinator {
     #endif
 }
 
-public final class AnyViewCoordinator<Route: Hashable>: _opaque_AnyViewCoordinator, ViewCoordinator {
-    public let base: EnvironmentProvider
+public final class AnyViewCoordinator<Route>: _opaque_AnyViewCoordinator, ViewCoordinator {
+    public let base: EnvironmentPropagator
     
-    public var environmentBuilder: EnvironmentBuilder {
+    public var environmentInsertions: EnvironmentInsertions {
         get {
-            base.environmentBuilder
+            base.environmentInsertions
         } set {
-            base.environmentBuilder = newValue
+            base.environmentInsertions = newValue
         }
     }
     

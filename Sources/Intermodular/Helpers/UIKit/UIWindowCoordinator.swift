@@ -10,14 +10,10 @@ import SwiftUIX
 
 public protocol _opaque_UIWindowCoordinator: AnyObject {
     var window: UIWindow? { get set }
-    
-    init(window: UIWindow?)
 }
 
 public protocol UIWindowCoordinatorProtocol: _opaque_UIWindowCoordinator, ViewCoordinator {
     var window: UIWindow? { get set }
-    
-    init(window: UIWindow?)
 }
 
 open class UIWindowCoordinator<Route: Hashable>: BaseViewCoordinator<Route>, _opaque_UIWindowCoordinator {
@@ -35,7 +31,7 @@ open class UIWindowCoordinator<Route: Hashable>: BaseViewCoordinator<Route>, _op
         window?.presentationName
     }
     
-    public required init(window: UIWindow? = nil) {
+    public init(window: UIWindow? = nil) {
         self.window = window
     }
     
@@ -55,7 +51,7 @@ open class UIWindowCoordinator<Route: Hashable>: BaseViewCoordinator<Route>, _op
             let window = try self.window.unwrap()
             
             return transition(for: route)
-                .mergeEnvironmentBuilder(environmentBuilder)
+                .environment(environmentInsertions)
                 .triggerPublisher(in: window, coordinator: self)
                 .handleOutput { [weak self] _ in
                     self?.updateAllChildren()
