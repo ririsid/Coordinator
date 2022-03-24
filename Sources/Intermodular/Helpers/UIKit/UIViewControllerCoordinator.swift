@@ -10,19 +10,17 @@ import SwiftUIX
 
 public protocol _opaque_UIViewControllerCoordinator: AnyObject {
     var rootViewController: UIViewController? { get set }
-    
-    init(rootViewController: UIViewController?)
 }
 
 public protocol UIViewControllerCoordinatorProtocol: _opaque_UIViewControllerCoordinator, ViewCoordinator {
     var rootViewController: UIViewController? { get set }
-    
-    init(rootViewController: UIViewController?)
 }
 
-open class UIViewControllerCoordinator<Route: Hashable>: BaseViewCoordinator<Route>, DynamicViewPresenter, UIViewControllerCoordinatorProtocol {
-    @Published public var rootViewController: UIViewController? {
-        didSet {
+open class UIViewControllerCoordinator<Route>: BaseViewCoordinator<Route>, DynamicViewPresenter, UIViewControllerCoordinatorProtocol {
+    public var rootViewController: UIViewController? {
+        willSet {
+            objectWillChange.send()
+        } didSet {
             updateAllChildren()
         }
     }
@@ -42,7 +40,7 @@ open class UIViewControllerCoordinator<Route: Hashable>: BaseViewCoordinator<Rou
     }
     
     @inlinable
-    public required init(rootViewController: UIViewController? = nil) {
+    public init(rootViewController: UIViewController? = nil) {
         self.rootViewController = rootViewController
     }
     
