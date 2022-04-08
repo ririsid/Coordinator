@@ -8,7 +8,6 @@ import SwiftUIX
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension UIViewController {
-    @inlinable
     public func trigger(
         _ transition: ViewTransition,
         animated: Bool,
@@ -20,7 +19,7 @@ extension UIViewController {
                     completion()
                 }
             }
-            
+                
             case .replace(let view): do {
                 if let viewController = topmostPresentedViewController?.presentingViewController {
                     viewController.dismiss(animated: animated) {
@@ -34,7 +33,7 @@ extension UIViewController {
                     }
                 }
             }
-            
+                
             case .dismiss: do {
                 guard presentedViewController != nil else {
                     throw ViewTransition.Error.nothingToDismiss
@@ -60,30 +59,30 @@ extension UIViewController {
                     completion()
                 }
             }
-            
+                
             case .dismissView(let name): do {
                 _ = dismissView(named: name)
                     .onOutput(do: completion())
                     .retainSink()
             }
-            
+                
             case .push(let view): do {
                 guard let navigationController = nearestNavigationController else {
                     throw ViewTransition.Error.navigationControllerMissing
                 }
                 
                 navigationController.pushViewController(
-                    CocoaHostingController(mainView: view),
+                    view._toAppKitOrUIKitViewController(),
                     animated: animated
                 ) {
                     completion()
                 }
             }
-            
+                
             case .pushOrPresent(let view): do {
                 if let navigationController = nearestNavigationController {
                     navigationController.pushViewController(
-                        CocoaHostingController(mainView: view),
+                        view._toAppKitOrUIKitViewController(),
                         animated: animated
                     ) {
                         completion()
@@ -94,7 +93,7 @@ extension UIViewController {
                     }
                 }
             }
-            
+                
             case .pop: do {
                 guard let viewController = nearestNavigationController else {
                     throw ViewTransition.Error.navigationControllerMissing
@@ -104,7 +103,7 @@ extension UIViewController {
                     completion()
                 }
             }
-            
+                
             case .popToRoot: do {
                 guard let viewController = nearestNavigationController else {
                     throw ViewTransition.Error.navigationControllerMissing
@@ -114,7 +113,7 @@ extension UIViewController {
                     completion()
                 }
             }
-            
+                
             case .popOrDismiss: do {
                 if let navigationController = nearestNavigationController, navigationController.viewControllers.count > 1 {
                     navigationController.popViewController(animated: animated) {
@@ -130,7 +129,7 @@ extension UIViewController {
                     }
                 }
             }
-            
+                
             case .popToRootOrDismiss: do {
                 if let navigationController = nearestNavigationController, navigationController.viewControllers.count > 1 {
                     navigationController.popToRootViewController(animated: animated) {
@@ -146,28 +145,28 @@ extension UIViewController {
                     }
                 }
             }
-            
+                
             case .setRoot(let view): do {
                 if let viewController = self as? CocoaHostingController<AnyPresentationView> {
                     viewController.rootView.content = view
                     
                     completion()
                 } else if let window = self.view.window, window.rootViewController === self {
-                    window.rootViewController = CocoaHostingController(mainView: view)
+                    window.rootViewController = view._toAppKitOrUIKitViewController()
                     
                     completion()
                 } else {
                     throw ViewTransition.Error.cannotSetRoot
                 }
             }
-            
+                
             case .set(let view): do {
                 if let viewController = nearestNavigationController {
-                    viewController.setViewControllers([CocoaHostingController(mainView: view)], animated: animated)
+                    viewController.setViewControllers([view._toAppKitOrUIKitViewController()], animated: animated)
                     
                     completion()
                 } else if let window = self.view.window, window.rootViewController === self {
-                    window.rootViewController = CocoaHostingController(mainView: view)
+                    window.rootViewController = view._toAppKitOrUIKitViewController()
                     
                     completion()
                 } else if let viewController = self as? CocoaHostingController<AnyPresentationView> {
@@ -182,7 +181,7 @@ extension UIViewController {
                     }
                 }
             }
-                        
+                
             case .linear(var transitions): do {
                 guard !transitions.isEmpty else {
                     return completion()
@@ -204,17 +203,16 @@ extension UIViewController {
                     throw error
                 }
             }
-            
+                
             case .custom: do {
                 fatalError()
             }
-            
+                
             case .none:
                 break
         }
     }
     
-    @usableFromInline
     func presentOnTop(
         _ view: AnyPresentationView,
         named viewName: AnyHashable?,
@@ -227,7 +225,6 @@ extension UIViewController {
 }
 
 extension ViewTransition {
-    @usableFromInline
     func triggerPublisher<VC: ViewCoordinator>(
         in controller: UIViewController,
         animated: Bool,
